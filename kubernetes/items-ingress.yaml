@@ -1,0 +1,32 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: items-middleware
+  namespace: itemsapp
+spec:
+  stripPrefix:
+    forceSlash: false
+    prefixes:
+      - /
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: items-app-ingress
+  namespace: itemsapp
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+    traefik.ingress.kubernetes.io/router.middlewares: items-items-middleware@kubernetescrd
+spec:
+  ingressClassName: "traefik"
+  rules:
+    - host: items.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: items-service
+                port:
+                  number: 5000

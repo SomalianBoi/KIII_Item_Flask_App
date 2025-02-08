@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: itemsapp
+data:
+  DATABASE_URL: "mongodb://mongodb_container:27017/mydatabase"
+  FLASK_ENV: "production"
+  APP_PORT: "5000"

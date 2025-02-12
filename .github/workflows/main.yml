@@ -26,3 +26,19 @@ jobs:
       - name: Push Docker image to DockerHub
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/kiii-web:latest
+
+      - name: Send Discord notification on success
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d "{\"username\": \"GitHub Actions\", \"content\": \"✅ Build & push succeeded for **${{ github.repository }}** on branch **${{ github.ref_name }}**.\"}" \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Send Discord notification on failure
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d "{\"username\": \"GitHub Actions\", \"content\": \"❌ Build & push failed for **${{ github.repository }}** on branch **${{ github.ref_name }}**. Check logs for details.\"}" \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}

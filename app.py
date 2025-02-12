@@ -9,6 +9,9 @@ app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 print(os.getenv("MONGO_URI"))
 mongo = PyMongo(app)
 
+@app.route("/health")
+def health_check():
+    return {"status": "healthy"}, 200
 
 @app.route('/')
 def index():

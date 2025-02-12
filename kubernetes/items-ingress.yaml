@@ -1,8 +1,8 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: items-middleware
-  namespace: itemsapp
+  name: flaskapp-middleware
+  namespace: flaskapp
 spec:
   stripPrefix:
     forceSlash: false
@@ -12,13 +12,12 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: items-app-ingress
-  namespace: itemsapp
+  name: flaskapp-ingress
+  namespace: flaskapp
   annotations:
     ingress.kubernetes.io/ssl-redirect: "false"
-    traefik.ingress.kubernetes.io/router.middlewares: items-items-middleware@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: flaskapp-flaskapp-middleware@kubernetescrd
 spec:
-  ingressClassName: "traefik"
   rules:
     - host: items.local
       http:
@@ -27,6 +26,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: items-service
+                name: flaskapp-service
                 port:
                   number: 5000
+

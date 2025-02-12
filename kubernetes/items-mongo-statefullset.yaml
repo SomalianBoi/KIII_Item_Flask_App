@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: flaskapp-db
+  namespace: flaskapp
+spec:
+  serviceName: "flaskapp-db-headless"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: flaskapp-db
+  template:
+    metadata:
+      labels:
+        app: flaskapp-db
+    spec:
+      dnsConfig:
+        searches:
+          - flaskapp-db-headless.flaskapp.svc.cluster.local
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: flaskapp-db
+                topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: flaskapp-db
+          image: mongo:4.4
+          command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: flaskapp-db-storage
+              mountPath: /data/db
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: flaskapp-secret  
+                  key: app-root-username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: flaskapp-secret 
+                  key: app-root-password
+  volumeClaimTemplates:
+    - metadata:
+        name: flaskapp-db-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

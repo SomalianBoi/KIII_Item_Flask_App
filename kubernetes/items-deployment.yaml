@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flaskapp-deploy
+  namespace: flaskapp
+  labels:
+    app: flaskapp
+    environment: production
+    team: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flaskapp
+  template:
+    metadata:
+      labels:
+        app: flaskapp
+    spec:
+      containers:
+        - name: flaskapp
+          image: somalianboi/kiii-web:latest  # Replace with your image
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          envFrom:
+            - configMapRef:
+                name: flaskapp-configmap
+          env:
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: flaskapp-secret
+                  key: app-root-username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: flaskapp-secret
+                  key: app-root-password
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: flaskapp-configmap
+                  key: MONGO_URI
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 5000
+          #   initialDelaySeconds: 60
+          #   periodSeconds: 15
+          # readinessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 5000
+          #   initialDelaySeconds: 40
+          #   periodSeconds: 10
+          volumeMounts:
+            - mountPath: "/app/data"
+              name: app-storage
+      volumes:
+        - name: app-storage
+          persistentVolumeClaim:
+            claimName: app-pvc

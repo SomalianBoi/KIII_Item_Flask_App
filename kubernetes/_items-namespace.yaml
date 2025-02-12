@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: itemsapp
+  name: flaskapp  # Change this name if you want a different one

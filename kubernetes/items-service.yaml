@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: kiii-app-service
-  namespace: itemsapp
+  name: flaskapp-service
+  namespace: flaskapp
 spec:
   selector:
-    app: kiii-app
+    app: flaskapp
   ports:
     - protocol: TCP
       port: 5000        
       targetPort: 5000  
-  type: ClusterIP
+

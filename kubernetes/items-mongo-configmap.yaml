@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flaskapp-db-configmap
+  namespace: flaskapp
+data:
+  MONGO_INITDB_DATABASE: flaskappdb
